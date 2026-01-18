@@ -7,6 +7,7 @@
 - Fixed production/staging crash caused by undefined `BranchDb` constant when gem is only loaded in development/test groups
 - Updated initializer template with `return unless defined?(BranchDb)` guard
 - Updated documentation with `defined?(BranchDb)` guard in `database.yml` examples
+- Removed unnecessary `Gemfile.lock` file
 
 ## [0.1.0] - 2026-01-18
 
