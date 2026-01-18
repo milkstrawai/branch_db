@@ -1,3 +1,5 @@
+return unless defined?(BranchDb)
+
 BranchDb.configure do |config|
   # The name of your main/stable branch (default: 'main')
   # config.main_branch = 'main'

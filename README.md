@@ -78,14 +78,14 @@ Update your `config/database.yml`:
 ```yaml
 development:
   <<: *default
-  database: <%= BranchDb.database_name('myapp_development') %>
+  database: <%= defined?(BranchDb) ? BranchDb.database_name('myapp_development') : 'myapp_development' %>
 
 test:
   <<: *default
-  database: <%= BranchDb.database_name('myapp_test') %>
+  database: <%= defined?(BranchDb) ? BranchDb.database_name('myapp_test') : 'myapp_test' %>
 ```
 
-> **Note:** Replace `myapp` with your application name. Keep `_development` and `_test` suffixes for the cleanup feature to work correctly.
+> **Note:** The `defined?(BranchDb)` guard ensures production/staging environments work correctly since the gem is only loaded in development/test. Replace `myapp` with your application name.
 
 Initialize your first branch database:
 
