@@ -6,13 +6,11 @@ SimpleCov.start do
   add_group "Generators", "lib/generators"
 
   enable_coverage :branch
-
   minimum_coverage line: 100, branch: 90
 end
 
 require "active_record"
 require "rake"
-require "pg"
 require "branch_db"
 
 Dir[File.join(__dir__, "support", "**", "*.rb")].each { |f| require f }

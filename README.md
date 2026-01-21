@@ -43,6 +43,8 @@ git status
 # Run db:migrate? Schema.rb still shows the foreign column
 ```
 
+More complex migrations could cause the code to stop working like renaming tables, adding foreign keys, or removing columns!
+
 ## The Solution
 
 BranchDb automatically manages separate databases for each branch:

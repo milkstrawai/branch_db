@@ -1,29 +1,59 @@
-name: Ruby
+name: CI
 
 on:
   push:
     branches:
       - main
-
   pull_request:
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
-    name: Ruby ${{ matrix.ruby }}
-    strategy:
-      matrix:
-        ruby:
-          - '3.4.7'
-
+    name: RuboCop
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
+
       - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
+
+      - name: Run RuboCop
+        run: bundle exec rubocop
+
+  test:
+    runs-on: ubuntu-latest
+    name: Ruby ${{ matrix.ruby }} / Rails ${{ matrix.rails }}
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["3.2", "3.3", "3.4"]
+        rails: ["7.0", "7.1", "7.2", "8.0", "8.1"]
+        exclude:
+          # Rails 7.0 has issues with Ruby 3.4
+          - ruby: "3.4"
+            rails: "7.0"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Ruby ${{ matrix.ruby }}
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-      - name: Run the default task
-        run: bundle exec rake
+
+      - name: Set Rails version slug
+        id: rails-slug
+        run: echo "slug=rails-$(echo ${{ matrix.rails }} | tr '.' '-')" >> $GITHUB_OUTPUT
+
+      - name: Install appraisal dependencies
+        run: bundle exec appraisal ${{ steps.rails-slug.outputs.slug }} bundle install
+
+      - name: Run tests
+        run: bundle exec appraisal ${{ steps.rails-slug.outputs.slug }} rake spec
