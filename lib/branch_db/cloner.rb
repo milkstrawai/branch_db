@@ -21,20 +21,9 @@ module BranchDb
       database_exists?(source_db)
     end
 
-    def source_db
-      @source_db ||= determine_source_db
-    end
+    def source_db = @source_db ||= determine_source_db
 
-    def target_db
-      config[:database]
-    end
-
-    def base_name
-      suffix = BranchDb::Naming.branch_suffix
-      return target_db if suffix.empty?
-
-      target_db.sub(/#{Regexp.escape(suffix)}\z/, "")
-    end
+    def target_db = config[:database]
 
     private
 
@@ -46,6 +35,13 @@ module BranchDb
 
       check_pg_tools!(:psql, :pg_dump)
       database_exists?(parent_db) ? parent_db : main_db
+    end
+
+    def base_name
+      suffix = BranchDb::Naming.branch_suffix
+      return target_db if suffix.empty?
+
+      target_db.sub(/#{Regexp.escape(suffix)}\z/, "")
     end
 
     def database_exists?(db_name)
