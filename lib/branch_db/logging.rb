@@ -4,13 +4,9 @@ module BranchDb
 
     private
 
-    def log(message)
-      output.puts prefix? ? "#{PREFIX} #{message}" : message
-    end
+    def log(message) = output.puts prefix? ? "#{PREFIX} #{message}" : message
 
-    def log_indented(message)
-      output.puts prefix? ? "#{PREFIX}    #{message}" : "   #{message}"
-    end
+    def log_indented(message) = output.puts prefix? ? "#{PREFIX}    #{message}" : "   #{message}"
 
     def prefix? = @prefix != false
   end
