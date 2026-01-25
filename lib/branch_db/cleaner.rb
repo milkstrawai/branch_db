@@ -16,15 +16,13 @@ module BranchDb
     end
 
     def list_branch_databases
-      dev_dbs = find_databases(dev_prefix)
-      test_dbs = find_databases(test_prefix)
+      all_dbs = all_branch_databases
 
-      if dev_dbs.empty? && test_dbs.empty?
+      if all_dbs.empty?
         log "No branch databases found#{db_label}."
         return []
       end
 
-      all_dbs = dev_dbs + test_dbs
       log "Found #{all_dbs.size} branch database(s)#{db_label}:"
       all_dbs.each { |db| log "  - #{db}" }
       all_dbs
@@ -40,6 +38,17 @@ module BranchDb
                                            done_msg: "Prune complete#{db_label}!", confirm:)
     end
 
+    private
+
+    def deletable_databases = all_branch_databases.reject { |db| protected_databases.include?(db) }
+
+    def prunable_databases
+      existing = BranchDb::Naming.git_branches.map { BranchDb::Naming.sanitize_branch(_1) }
+      all_branch_databases.reject { |db| protected_databases.include?(db) || branch_exists?(db, existing) }
+    end
+
+    def all_branch_databases = find_databases(dev_prefix) + find_databases(test_prefix)
+
     def protected_databases
       current_dev = config[:database]
       current_test = current_dev.sub(dev_prefix, test_prefix)
@@ -51,19 +60,6 @@ module BranchDb
         "#{test_prefix}#{BranchDb.configuration.main_branch}"
       ]
     end
-
-    private
-
-    def deletable_databases
-      all_branch_databases.reject { |db| protected_databases.include?(db) }
-    end
-
-    def prunable_databases
-      existing = BranchDb::Naming.git_branches.map { BranchDb::Naming.sanitize_branch(_1) }
-      all_branch_databases.reject { |db| protected_databases.include?(db) || branch_exists?(db, existing) }
-    end
-
-    def all_branch_databases = find_databases(dev_prefix) + find_databases(test_prefix)
 
     def branch_exists?(db, existing_branches)
       prefix = db.start_with?(test_prefix) ? test_prefix : dev_prefix

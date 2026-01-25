@@ -3,22 +3,22 @@ module BranchDb
     extend GitUtils
 
     class << self
-      def sanitize_branch(branch)
-        branch.gsub(/[^a-zA-Z0-9_]/, "_")
-      end
+      def main_database_name(base_name) = "#{base_name}#{suffix_for(BranchDb.configuration.main_branch)}"
 
-      def branch_suffix
-        branch = sanitize_branch(current_branch)
+      def database_name(base_name) = "#{base_name}#{branch_suffix}"
+
+      def branch_suffix = suffix_for(current_branch)
+
+      def suffix_for(branch)
+        branch = sanitize_branch(branch)
         max_length = BranchDb.configuration.max_branch_length
         truncated = branch[0, max_length]
         truncated.empty? ? "" : "_#{truncated}"
       end
 
-      def database_name(base_name) = "#{base_name}#{branch_suffix}"
-
-      def main_database_name(base_name) = "#{base_name}_#{BranchDb.configuration.main_branch}"
-
       def parent_database_name(base_name) = "#{base_name}_#{sanitize_branch(parent_branch)}"
+
+      def sanitize_branch(branch) = branch.gsub(/[^a-zA-Z0-9_]/, "_")
     end
   end
 end

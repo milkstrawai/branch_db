@@ -35,12 +35,12 @@ RSpec.describe BranchDb::Cloner do
 
   describe "#base_name" do
     it "removes branch suffix from target database" do
-      expect(cloner.base_name).to eq("myapp_development")
+      expect(cloner.send(:base_name)).to eq("myapp_development")
     end
 
     it "returns target_db when no branch suffix" do
       stub_branch_suffix("")
-      expect(cloner.base_name).to eq("myapp_development_feature_auth")
+      expect(cloner.send(:base_name)).to eq("myapp_development_feature_auth")
     end
   end
 
