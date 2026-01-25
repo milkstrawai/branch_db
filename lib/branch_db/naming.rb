@@ -3,7 +3,7 @@ module BranchDb
     extend GitUtils
 
     class << self
-      def main_database_name(base_name) = "#{base_name}#{BranchDb.configuration.main_branch}"
+      def main_database_name(base_name) = "#{base_name}#{suffix_for(BranchDb.configuration.main_branch)}"
 
       def database_name(base_name) = "#{base_name}#{branch_suffix}"
 
