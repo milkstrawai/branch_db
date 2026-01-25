@@ -1,21 +1,15 @@
 module BranchDb
   module GitUtils
-    def current_branch
-      `git symbolic-ref HEAD 2>/dev/null`.chomp.sub("refs/heads/", "")
-    end
+    def current_branch = `git symbolic-ref HEAD 2>/dev/null`.chomp.sub("refs/heads/", "")
 
     def git_branches
       output = `git branch --format='%(refname:short)' 2>/dev/null`
       output.split("\n").map(&:strip).reject(&:empty?)
     end
 
-    def parent_branch
-      @parent_branch ||= detect_parent_branch
-    end
+    def parent_branch = @parent_branch ||= detect_parent_branch
 
-    def reset_parent_cache!
-      @parent_branch = nil
-    end
+    def reset_parent_cache! = @parent_branch = nil
 
     private
 
