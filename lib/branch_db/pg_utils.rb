@@ -14,13 +14,9 @@ module BranchDb
       "-h #{host} -p #{port} -U #{username}"
     end
 
-    def pg_env
-      { "PGPASSWORD" => config[:password].to_s }
-    end
+    def pg_env = { "PGPASSWORD" => config[:password].to_s }
 
-    def list_databases_cmd
-      "psql #{psql_flags} -lqt | cut -d \\| -f 1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'"
-    end
+    def list_databases_cmd = "psql #{psql_flags} -lqt | cut -d \\| -f 1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'"
 
     def check_pg_tools!(*tools)
       tools = PG_TOOLS if tools.empty?
