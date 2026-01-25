@@ -1,5 +1,15 @@
 ## [Unreleased]
 
+## [0.1.2] - 2026-01-25
+
+### Fixed
+
+- Fixed `main_database_name` to truncate the branch name to the configured length
+
+### Changed
+
+- Refactored internal modules for improved code quality
+
 ## [0.1.1] - 2026-01-18
 
 ### Fixed
