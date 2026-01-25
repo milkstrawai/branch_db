@@ -24,13 +24,9 @@ module BranchDb
 
     private
 
-    def config
-      db_config.configuration_hash
-    end
+    def config = db_config.configuration_hash
 
-    def db_label
-      db_config.name == "primary" ? "" : " (#{db_config.name})"
-    end
+    def db_label = db_config.name == "primary" ? "" : " (#{db_config.name})"
 
     def needs_cloning?
       establish_connection
@@ -39,9 +35,7 @@ module BranchDb
       true
     end
 
-    def establish_connection
-      ActiveRecord::Base.establish_connection(db_config)
-    end
+    def establish_connection = ActiveRecord::Base.establish_connection(db_config)
 
     def attempt_clone
       cloner = Cloner.new(config, output:)
