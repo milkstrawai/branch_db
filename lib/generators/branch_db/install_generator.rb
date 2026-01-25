@@ -19,10 +19,10 @@ module BranchDb
       say "1. Update your config/database.yml to use dynamic database names:"
       say ""
       say "   development:"
-      say "     database: <%= defined?(BranchDb) ? BranchDb.database_name('#{app_name}_development') : '#{app_name}_development' %>" # rubocop:disable Layout/LineLength
+      say "     database: <%= BranchDb.database_name('#{app_name}_development') rescue '#{app_name}_development' %>"
       say ""
       say "   test:"
-      say "     database: <%= defined?(BranchDb) ? BranchDb.database_name('#{app_name}_test') : '#{app_name}_test' %>"
+      say "     database: <%= BranchDb.database_name('#{app_name}_test') rescue '#{app_name}_test' %>"
       say ""
       say "2. Initialize your database:"
       say "   rails db:prepare          # Creates and clones from main"

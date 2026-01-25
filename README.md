@@ -80,14 +80,14 @@ Update your `config/database.yml`:
 ```yaml
 development:
   <<: *default
-  database: <%= defined?(BranchDb) ? BranchDb.database_name('myapp_development') : 'myapp_development' %>
+  database: <%= BranchDb.database_name('myapp_development') rescue 'myapp_development' %>
 
 test:
   <<: *default
-  database: <%= defined?(BranchDb) ? BranchDb.database_name('myapp_test') : 'myapp_test' %>
+  database: <%= BranchDb.database_name('myapp_test') rescue 'myapp_test' %>
 ```
 
-> **Note:** The `defined?(BranchDb)` guard ensures production/staging environments work correctly since the gem is only loaded in development/test. Replace `myapp` with your application name.
+> **Note:** The `rescue` fallback ensures production/staging environments work correctly since the gem is only loaded in development/test. Replace `myapp` with your application name.
 
 Initialize your first branch database:
 
