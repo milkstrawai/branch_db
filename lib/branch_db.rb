@@ -13,20 +13,12 @@ module BranchDb
   class Error < StandardError; end
 
   class << self
-    def configuration
-      @configuration ||= Configuration.new
-    end
+    def configuration = @configuration ||= Configuration.new
 
-    def configure
-      yield(configuration)
-    end
+    def configure = yield(configuration)
 
-    def database_name(base_name)
-      Naming.database_name(base_name)
-    end
+    def database_name(base_name) = Naming.database_name(base_name)
 
-    def main_database_name(base_name)
-      Naming.main_database_name(base_name)
-    end
+    def main_database_name(base_name) = Naming.main_database_name(base_name)
   end
 end
