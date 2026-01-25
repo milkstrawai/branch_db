@@ -74,21 +74,21 @@ RSpec.describe BranchDb::Cleaner do
 
   describe "#protected_databases" do
     it "includes current dev and test databases" do
-      expect(cleaner.protected_databases).to include("myapp_development_feature_auth", "myapp_test_feature_auth")
+      expect(cleaner.send(:protected_databases)).to include("myapp_development_feature_auth", "myapp_test_feature_auth")
     end
 
     it "includes main dev and test databases" do
-      expect(cleaner.protected_databases).to include("myapp_development_main", "myapp_test_main")
+      expect(cleaner.send(:protected_databases)).to include("myapp_development_main", "myapp_test_main")
     end
 
     it "uses configured main branch" do
       BranchDb.configure { |c| c.main_branch = "master" }
-      expect(cleaner.protected_databases).to include("myapp_development_master", "myapp_test_master")
+      expect(cleaner.send(:protected_databases)).to include("myapp_development_master", "myapp_test_master")
     end
 
     it "uses configured development and test suffixes" do
       BranchDb.configure { |c| c.development_suffix = "_dev" }
-      expect(cleaner.protected_databases).to include("myapp_development_feature_auth")
+      expect(cleaner.send(:protected_databases)).to include("myapp_development_feature_auth")
     end
   end
 
