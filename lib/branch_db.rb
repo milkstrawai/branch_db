@@ -7,6 +7,7 @@ require_relative "branch_db/logging"
 require_relative "branch_db/cloner"
 require_relative "branch_db/cleaner"
 require_relative "branch_db/preparer"
+require_relative "branch_db/middleware"
 require_relative "branch_db/railtie" if defined?(Rails::Railtie)
 
 module BranchDb
