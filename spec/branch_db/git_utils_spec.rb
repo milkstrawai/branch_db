@@ -3,15 +3,22 @@ RSpec.describe BranchDb::GitUtils do
   let(:naming) { BranchDb::Naming }
 
   describe "#current_branch" do
-    it "returns the current git branch name" do
-      allow(naming).to receive(:`).with("git symbolic-ref HEAD 2>/dev/null")
-                                  .and_return("refs/heads/feature-auth\n")
+    before do
+      allow(naming).to receive(:`).with("git rev-parse --git-dir 2>/dev/null").and_return(".git\n")
+    end
 
+    it "returns the current git branch name" do
+      allow(File).to receive(:read).with(".git/HEAD").and_return("ref: refs/heads/feature-auth\n")
       expect(naming.current_branch).to eq("feature-auth")
     end
 
     it "returns empty string when not in a git repo" do
-      allow(naming).to receive(:`).with("git symbolic-ref HEAD 2>/dev/null").and_return("")
+      allow(File).to receive(:read).with(".git/HEAD").and_raise(Errno::ENOENT)
+      expect(naming.current_branch).to eq("")
+    end
+
+    it "returns empty string for detached HEAD" do
+      allow(File).to receive(:read).with(".git/HEAD").and_return("abc123def456\n")
       expect(naming.current_branch).to eq("")
     end
   end

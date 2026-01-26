@@ -1,6 +1,10 @@
 module BranchDb
   module GitUtils
-    def current_branch = `git symbolic-ref HEAD 2>/dev/null`.chomp.sub("refs/heads/", "")
+    def current_branch
+      File.read(File.join(git_dir, "HEAD"))[%r{\Aref: refs/heads/(.+)}, 1]&.strip || ""
+    rescue StandardError
+      ""
+    end
 
     def git_branches
       output = `git branch --format='%(refname:short)' 2>/dev/null`
@@ -14,6 +18,8 @@ module BranchDb
     end
 
     private
+
+    def git_dir = @git_dir ||= `git rev-parse --git-dir 2>/dev/null`.strip
 
     def detect_parent_from_reflog
       current = current_branch
