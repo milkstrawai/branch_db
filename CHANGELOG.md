@@ -1,5 +1,14 @@
 ## [Unreleased]
 
+### Added
+
+- Middleware to automatically clone the database on request when the git branch changes
+
+### Changed
+
+- Optimized `current_branch` from 12ms to 0.01ms (after git_dir is cached)
+- Removed parent_branch caching for simpler code and avoid stale parent branch detection
+
 ## [0.1.2] - 2026-01-26
 
 ### Fixed
