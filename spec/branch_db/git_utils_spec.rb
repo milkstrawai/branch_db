@@ -108,25 +108,5 @@ RSpec.describe BranchDb::GitUtils do
         expect(naming.parent_branch).to eq("main")
       end
     end
-
-    context "with caching" do
-      before do
-        allow(naming).to receive(:current_branch).and_return("feature-child")
-        allow(naming).to receive(:`).with("git reflog show --format='%gs' -n 1000 2>/dev/null")
-                                    .and_return("checkout: moving from feature-parent to feature-child\n")
-      end
-
-      it "caches the result" do
-        2.times { naming.parent_branch }
-        expect(naming).to have_received(:`).once
-      end
-
-      it "clears cache when reset_parent_cache! is called" do
-        naming.parent_branch
-        naming.reset_parent_cache!
-        naming.parent_branch
-        expect(naming).to have_received(:`).twice
-      end
-    end
   end
 end

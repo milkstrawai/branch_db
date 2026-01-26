@@ -25,6 +25,5 @@ RSpec.configure do |config|
 
   config.before do
     BranchDb.instance_variable_set(:@configuration, nil)
-    BranchDb::Naming.reset_parent_cache!
   end
 end

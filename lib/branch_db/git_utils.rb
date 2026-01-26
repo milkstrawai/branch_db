@@ -7,17 +7,13 @@ module BranchDb
       output.split("\n").map(&:strip).reject(&:empty?)
     end
 
-    def parent_branch = @parent_branch ||= detect_parent_branch
-
-    def reset_parent_cache! = @parent_branch = nil
-
-    private
-
-    def detect_parent_branch
+    def parent_branch
       return ENV["BRANCH_DB_PARENT"] if ENV["BRANCH_DB_PARENT"]
 
       detect_parent_from_reflog || BranchDb.configuration.main_branch
     end
+
+    private
 
     def detect_parent_from_reflog
       current = current_branch
