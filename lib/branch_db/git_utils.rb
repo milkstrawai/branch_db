@@ -23,11 +23,9 @@ module BranchDb
       current = current_branch
       return nil if current.empty?
 
-      `git reflog show --format='%gs' -n 100 2>/dev/null`.each_line do |line|
-        parent = extract_parent_from_reflog_line(line.chomp, current)
-        return parent if parent
-      end
-      nil
+      `git reflog show --format='%gs' -n 1000 2>/dev/null`.each_line.filter_map do |line|
+        extract_parent_from_reflog_line(line.chomp, current)
+      end.last
     end
 
     def extract_parent_from_reflog_line(line, current)

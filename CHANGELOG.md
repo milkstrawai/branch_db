@@ -1,10 +1,11 @@
 ## [Unreleased]
 
-## [0.1.2] - 2026-01-25
+## [0.1.2] - 2026-01-26
 
 ### Fixed
 
 - Fixed `main_database_name` to truncate the branch name to the configured length
+- Fixed parent branch detection to find the original parent instead of the most recent checkout
 
 ### Changed
 
