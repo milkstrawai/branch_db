@@ -9,5 +9,12 @@ module BranchDb
     initializer "branch_db.middleware" do |app|
       app.middleware.use BranchDb::Middleware if Rails.env.development?
     end
+
+    initializer "branch_db.test_prepare", after: :load_config_initializers do
+      next unless Rails.env.test?
+
+      db_configs = ActiveRecord::Base.configurations.configs_for(env_name: Rails.env)
+      db_configs.each { |db_config| Preparer.new(db_config).prepare_if_needed }
+    end
   end
 end
