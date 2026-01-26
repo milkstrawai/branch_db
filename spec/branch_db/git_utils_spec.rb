@@ -51,7 +51,7 @@ RSpec.describe BranchDb::GitUtils do
 
       it "ignores git reflog" do
         allow(naming).to receive(:current_branch).and_return("feature-child")
-        allow(naming).to receive(:`).with("git reflog show --format='%gs' -n 100 2>/dev/null")
+        allow(naming).to receive(:`).with("git reflog show --format='%gs' -n 1000 2>/dev/null")
                                     .and_return("checkout: moving from other-branch to feature-child\n")
 
         expect(naming.parent_branch).to eq("feature-parent")
@@ -64,7 +64,7 @@ RSpec.describe BranchDb::GitUtils do
       end
 
       it "finds the parent branch from reflog checkout entry" do
-        allow(naming).to receive(:`).with("git reflog show --format='%gs' -n 100 2>/dev/null")
+        allow(naming).to receive(:`).with("git reflog show --format='%gs' -n 1000 2>/dev/null")
                                     .and_return("checkout: moving from feature-parent to feature-child\n")
 
         expect(naming.parent_branch).to eq("feature-parent")
@@ -73,7 +73,7 @@ RSpec.describe BranchDb::GitUtils do
       it "skips SHA-based parents (detached HEAD)" do
         sha = "abc123def456789012345678901234567890abcd"
         reflog = "checkout: moving from #{sha} to feature-child\ncheckout: moving from real-parent to #{sha}\n"
-        allow(naming).to receive(:`).with("git reflog show --format='%gs' -n 100 2>/dev/null")
+        allow(naming).to receive(:`).with("git reflog show --format='%gs' -n 1000 2>/dev/null")
                                     .and_return(reflog)
 
         expect(naming.parent_branch).to eq("main")
@@ -82,20 +82,20 @@ RSpec.describe BranchDb::GitUtils do
       it "skips entries where parent equals current branch" do
         reflog = "checkout: moving from feature-child to feature-child\n" \
                  "checkout: moving from real-parent to feature-child\n"
-        allow(naming).to receive(:`).with("git reflog show --format='%gs' -n 100 2>/dev/null")
+        allow(naming).to receive(:`).with("git reflog show --format='%gs' -n 1000 2>/dev/null")
                                     .and_return(reflog)
         expect(naming.parent_branch).to eq("real-parent")
       end
 
       it "falls back to main when no valid parent found" do
-        allow(naming).to receive(:`).with("git reflog show --format='%gs' -n 100 2>/dev/null")
+        allow(naming).to receive(:`).with("git reflog show --format='%gs' -n 1000 2>/dev/null")
                                     .and_return("commit: some message\n")
 
         expect(naming.parent_branch).to eq("main")
       end
 
       it "falls back to main when reflog is empty" do
-        allow(naming).to receive(:`).with("git reflog show --format='%gs' -n 100 2>/dev/null")
+        allow(naming).to receive(:`).with("git reflog show --format='%gs' -n 1000 2>/dev/null")
                                     .and_return("")
 
         expect(naming.parent_branch).to eq("main")
@@ -112,7 +112,7 @@ RSpec.describe BranchDb::GitUtils do
     context "with caching" do
       before do
         allow(naming).to receive(:current_branch).and_return("feature-child")
-        allow(naming).to receive(:`).with("git reflog show --format='%gs' -n 100 2>/dev/null")
+        allow(naming).to receive(:`).with("git reflog show --format='%gs' -n 1000 2>/dev/null")
                                     .and_return("checkout: moving from feature-parent to feature-child\n")
       end
 
