@@ -3,15 +3,22 @@ RSpec.describe BranchDb::GitUtils do
   let(:naming) { BranchDb::Naming }
 
   describe "#current_branch" do
-    it "returns the current git branch name" do
-      allow(naming).to receive(:`).with("git symbolic-ref HEAD 2>/dev/null")
-                                  .and_return("refs/heads/feature-auth\n")
+    before do
+      allow(naming).to receive(:`).with("git rev-parse --git-dir 2>/dev/null").and_return(".git\n")
+    end
 
+    it "returns the current git branch name" do
+      allow(File).to receive(:read).with(".git/HEAD").and_return("ref: refs/heads/feature-auth\n")
       expect(naming.current_branch).to eq("feature-auth")
     end
 
     it "returns empty string when not in a git repo" do
-      allow(naming).to receive(:`).with("git symbolic-ref HEAD 2>/dev/null").and_return("")
+      allow(File).to receive(:read).with(".git/HEAD").and_raise(Errno::ENOENT)
+      expect(naming.current_branch).to eq("")
+    end
+
+    it "returns empty string for detached HEAD" do
+      allow(File).to receive(:read).with(".git/HEAD").and_return("abc123def456\n")
       expect(naming.current_branch).to eq("")
     end
   end
@@ -106,26 +113,6 @@ RSpec.describe BranchDb::GitUtils do
       it "falls back to main branch" do
         allow(naming).to receive(:current_branch).and_return("")
         expect(naming.parent_branch).to eq("main")
-      end
-    end
-
-    context "with caching" do
-      before do
-        allow(naming).to receive(:current_branch).and_return("feature-child")
-        allow(naming).to receive(:`).with("git reflog show --format='%gs' -n 1000 2>/dev/null")
-                                    .and_return("checkout: moving from feature-parent to feature-child\n")
-      end
-
-      it "caches the result" do
-        2.times { naming.parent_branch }
-        expect(naming).to have_received(:`).once
-      end
-
-      it "clears cache when reset_parent_cache! is called" do
-        naming.parent_branch
-        naming.reset_parent_cache!
-        naming.parent_branch
-        expect(naming).to have_received(:`).twice
       end
     end
   end

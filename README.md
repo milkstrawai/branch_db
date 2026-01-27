@@ -56,7 +56,7 @@ feature-payments    → myapp_development_feature_payments
 bugfix-login        → myapp_development_bugfix_login
 ```
 
-Each branch has its own isolated database with its own schema and data. Switch branches, restart your server, and you're working with the right database automatically.
+Each branch has its own isolated database with its own schema and data. Switch branches and you're working with the right database automatically — no server restart needed.
 
 ## Installation
 
@@ -142,10 +142,9 @@ rails db:prepare
 3. If on main branch or no source exists: defers to standard Rails behavior
 4. Rails then runs pending migrations and seeds as usual
 
-**Test databases** use standard Rails behavior (schema load, no cloning):
-```bash
-RAILS_ENV=test rails db:prepare
-```
+**Automatic branch switching (development):** A Rack middleware detects git branch changes on each request and automatically clones/prepares the database for the new branch. No server restart needed.
+
+**Test databases** are automatically created (if missing) when Rails boots in the test environment. Rails' test framework handles schema loading and migrations, so no cloning is needed.
 
 > **Note:** Cloning only runs in development environment. All commands support Rails' multiple database feature.
 
@@ -168,8 +167,8 @@ rails server
 
 # Switching to another branch
 git checkout feature-other-thing
-# Restart your Rails server to connect to the other database
-rails server
+# In development, the middleware auto-detects the branch change on next request
+# No server restart needed!
 
 # Purging all branch databases (keeps current and main only)
 rails db:branch:purge
@@ -191,10 +190,17 @@ rails db:branch:prune
 
 ### Rails Integration
 
-BranchDb enhances Rails' `db:prepare` task by adding a prerequisite that clones from the parent branch when needed. This means:
+BranchDb integrates with Rails through a Railtie that:
+
+- **Enhances `db:prepare`** - adds a prerequisite that clones from the parent branch when needed
+- **Inserts Rack middleware** (development only) - detects branch changes on each request and automatically prepares the new branch's database, reloading database configurations and reconnecting
+- **Creates test databases on boot** - in test environment, ensures the branch database exists when Rails loads
+
+This means:
 
 - **Zero learning curve** - use `rails db:prepare` as usual
 - **Automatic cloning** - new branch databases are cloned from their parent (or main as fallback)
+- **No server restarts** - the middleware handles branch switches automatically in development
 - **Rails handles the rest** - migrations, seeds, and schema dumps work normally
 
 ### Database Naming
@@ -287,15 +293,15 @@ RUN apt-get update && apt-get install -y postgresql-client
 
 ## Important Notes
 
-### Server Restart Required
+### Automatic Branch Switching (Development)
 
-Database selection happens at Rails boot time (ERB in `database.yml` is evaluated once). After switching branches, **restart your Rails server** to connect to the correct database.
+In development, a Rack middleware automatically detects branch changes on each HTTP request. When a branch switch is detected, the middleware:
 
-```bash
-git checkout other-branch
-# Must restart Rails to use other-branch's database
-rails server  # Now connected to myapp_development_other_branch
-```
+1. Reloads the database configuration
+2. Clones/prepares the new branch's database if needed
+3. Reconnects ActiveRecord to the correct database
+
+No server restart is required when switching branches in development.
 
 ### Detached HEAD State
 
@@ -338,7 +344,7 @@ docker ps | grep postgres
 
 ### Database not switching when I change branches
 
-Remember to restart your Rails server after switching branches. The database name is determined at boot time.
+In development, the middleware should automatically detect branch changes on each request. If the database is not switching, verify that `BranchDb::Middleware` is in your middleware stack by running `rails middleware`. The middleware is automatically inserted in development via the Railtie.
 
 ### Clone is slow for large databases
 
@@ -396,7 +402,7 @@ Features we're considering for future releases:
 
 - [ ] **SQLite and MySQL support** - Database adapter pattern for non-PostgreSQL databases
 - [ ] **Standalone clone task** - `rails db:branch:clone FROM=branch-name` for manual cloning
-- [ ] **Post-checkout git hook** - Auto-restart Rails server on branch switch (Doable?)
+- [x] **Automatic branch switching** - Middleware detects branch changes without server restart
 - [ ] **Database info task** - `rails db:branch:info` showing current branch, DB name, size, and parent
 - [ ] **Clone progress indicator** - Visual feedback for large database clones
 - [ ] **Disk usage report** - `rails db:branch:list --size` to show storage per branch
