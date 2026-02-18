@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Fixed
+
+- Skip non-PostgreSQL databases instead of failing when the app has multiple database adapters
+
 ## [0.1.2] - 2026-01-26
 
 ### Fixed
