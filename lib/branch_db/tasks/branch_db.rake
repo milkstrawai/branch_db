@@ -1,4 +1,4 @@
-def db_configs = ActiveRecord::Base.configurations.configs_for(env_name: Rails.env)
+def db_configs = ActiveRecord::Base.configurations.configs_for(env_name: Rails.env).select { |c| c.adapter == "postgresql" }
 
 def cleaner_for(db_config) = BranchDb::Cleaner.new(db_config.configuration_hash, prefix: false, name: db_config.name)
 
