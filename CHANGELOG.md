@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.1.4] - 2026-03-06
+
+### Added
+
+- `FORCE=1` environment variable to skip confirmation prompt on `db:branch:purge` and `db:branch:prune`
+
 ## [0.1.3] - 2026-02-19
 
 ### Fixed

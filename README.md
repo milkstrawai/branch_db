@@ -155,8 +155,8 @@ RAILS_ENV=test rails db:prepare
 |---------|-------------|
 | `rails db:prepare` | Rails' standard command, enhanced with cloning from parent/main |
 | `rails db:branch:list` | List all branch databases |
-| `rails db:branch:purge` | Remove all branch databases except current and main |
-| `rails db:branch:prune` | Remove databases for branches that no longer exist in git |
+| `rails db:branch:purge` | Remove all branch databases except current and main. Use `FORCE=1` to skip confirmation. |
+| `rails db:branch:prune` | Remove databases for branches that no longer exist in git. Use `FORCE=1` to skip confirmation. |
 
 ### Examples
 
@@ -185,6 +185,10 @@ rails db:branch:prune
 # =>   - myapp_development_merged_feature
 # =>   - myapp_test_merged_feature
 # => Proceed with deletion? [y/N]
+
+# Skip confirmation prompt (useful for CI/scripts)
+FORCE=1 rails db:branch:purge
+FORCE=1 rails db:branch:prune
 ```
 
 ## How It Works
