@@ -138,7 +138,7 @@ rails db:prepare
 
 **What happens (development only):**
 1. Checks if your branch's database exists and has schema
-2. If missing/empty and parent/main exists: **clones from parent branch** (or main as fallback)
+2. If missing or empty and a parent/main DB exists, clones from the parent branch (or main as fallback)
 3. If on main branch or no source exists: defers to standard Rails behavior
 4. Rails then runs pending migrations and seeds as usual
 
@@ -195,11 +195,11 @@ FORCE=1 rails db:branch:prune
 
 ### Rails Integration
 
-BranchDb enhances Rails' `db:prepare` task by adding a prerequisite that clones from the parent branch when needed. This means:
+BranchDb enhances Rails' `db:prepare` task by adding a prerequisite that clones from the parent branch when needed. That means:
 
-- **Zero learning curve** - use `rails db:prepare` as usual
-- **Automatic cloning** - new branch databases are cloned from their parent (or main as fallback)
-- **Rails handles the rest** - migrations, seeds, and schema dumps work normally
+- You keep running `rails db:prepare` — no new commands to learn.
+- New branch databases are cloned from their parent, falling back to main.
+- Migrations, seeds, and schema dumps work the way Rails normally handles them.
 
 ### Database Naming
 
@@ -218,15 +218,15 @@ Branch names are sanitized: non-alphanumeric characters become underscores, and 
 
 When `db:prepare` detects a missing or empty database:
 
-1. **Detects** the parent branch to clone from (see below)
-2. **Checks** if the parent database exists; if not, falls back to main
-3. **If source exists:** Creates the target database and uses `pg_dump | psql` for efficient cloning
-4. **If no source:** Defers to Rails' standard `db:prepare` (loads schema, runs migrations, seeds)
-5. **On main branch:** Defers to Rails' standard `db:prepare`
+1. Detect the parent branch to clone from (see below).
+2. Check whether the parent database exists; fall back to main if it doesn't.
+3. If a source exists, create the target database and copy it with `pg_dump | psql`.
+4. If no source exists, defer to Rails' standard `db:prepare` (schema load, migrations, seeds).
+5. On the main branch, defer to Rails' standard `db:prepare`.
 
 ### Parent Branch Detection
 
-BranchDb intelligently detects which branch you branched from and clones its database. This enables nested feature branch workflows:
+BranchDb figures out which branch you branched from and clones that branch's database, so nested feature branches work:
 
 ```
 main → feature-a → feature-a-child
@@ -251,6 +251,31 @@ BRANCH_DB_PARENT=main rails db:prepare
 # Clone from a specific branch
 BRANCH_DB_PARENT=feature-other rails db:prepare
 ```
+
+### Overriding the Branch or Database
+
+For cases where you want to point the app at a different database than the auto-derived branch DB (teammate's branch DB, restored dump, shared QA DB, etc.), use one of:
+
+**Override the branch** — everything else (branch suffix, clone source, purge protection) stays consistent, as if you were literally on that branch:
+
+```bash
+BRANCH_DB_BRANCH=main bin/rails server
+```
+
+> ⚠️ **Warning:** `BRANCH_DB_BRANCH` makes purge protection follow the override, not your real branch. If you set `BRANCH_DB_BRANCH=main` and run `rails db:branch:purge`, your real branch's database will be treated like any other branch DB and dropped. Unset the variable before running destructive tasks.
+
+**Override the database name** — bypasses branch-based logic entirely. Use one env var per Rails environment:
+
+```bash
+BRANCH_DB_DATABASE_DEVELOPMENT=shared_dev_db bin/rails server
+BRANCH_DB_DATABASE_TEST=shared_test_db      bin/rails test
+```
+
+When `BRANCH_DB_DATABASE_<ENV>` is set for the current `Rails.env`, the `db:branch:*` rake tasks (`list`, `purge`, `prune`, `ensure_cloned`) are skipped with a log message. BranchDb assumes you're managing the overridden database's lifecycle yourself.
+
+> ⚠️ **Single-database apps only.** The database-name override dispatches by base-name suffix (e.g., `_development`, `_test`). If your app uses multiple PostgreSQL databases (e.g., `primary` and `analytics`), two configs sharing the same suffix will all receive the same override value, which PostgreSQL cannot satisfy. Use `BRANCH_DB_BRANCH` instead, or wait for per-connection override support.
+
+**Precedence:** if both `BRANCH_DB_BRANCH` and `BRANCH_DB_DATABASE_<ENV>` are set, the database override wins for the connection name; the branch override still affects `current_branch` for anything else.
 
 ### Purge Safety
 
@@ -390,7 +415,7 @@ bundle exec rake
 
 ### Test Coverage
 
-The project maintains high test coverage standards:
+Coverage thresholds:
 - Line coverage: 100%
 - Branch coverage: 90%
 
@@ -409,13 +434,13 @@ Have a feature request? [Open an issue](https://github.com/milkstrawai/branch_db
 
 ## Contributing
 
-Contributions are welcome! Here's how you can help:
+Contributions are welcome. The usual drill:
 
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
+1. Fork the repository.
+2. Create a feature branch: `git checkout -b feature/amazing-feature`.
+3. Commit your changes: `git commit -m 'Add amazing feature'`.
+4. Push the branch: `git push origin feature/amazing-feature`.
+5. Open a pull request.
 
 ### Guidelines
 
