@@ -32,6 +32,12 @@ module BranchDb
       say "   rails db:branch:purge     # Remove all branch databases (keeps main/current)"
       say "   rails db:branch:prune     # Remove databases for deleted git branches"
       say ""
+      say "4. Optional environment variable overrides:"
+      say "   BRANCH_DB_BRANCH                  # Override the detected git branch name"
+      say "   BRANCH_DB_DATABASE_DEVELOPMENT    # Override the development database name"
+      say "   BRANCH_DB_DATABASE_TEST           # Override the test database name"
+      say "   See the README's \"Overriding the Branch or Database\" section for details."
+      say ""
     end
 
     private
