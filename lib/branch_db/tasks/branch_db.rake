@@ -6,21 +6,28 @@ namespace :db do
   namespace :branch do
     desc "List all branch databases"
     task list: :environment do
+      next if BranchDb.skip_for_env?(Rails.env)
+
       db_configs.each { cleaner_for(_1).list_branch_databases }
     end
 
     desc "Remove all branch databases (keeps main and current branch). Set FORCE=1 to skip confirmation."
     task purge: :environment do
+      next if BranchDb.skip_for_env?(Rails.env)
+
       db_configs.each { cleaner_for(_1).purge(confirm: ENV["FORCE"] != "1") }
     end
 
     desc "Remove databases for branches that no longer exist in git. Set FORCE=1 to skip confirmation."
     task prune: :environment do
+      next if BranchDb.skip_for_env?(Rails.env)
+
       db_configs.each { cleaner_for(_1).prune(confirm: ENV["FORCE"] != "1") }
     end
 
     desc "Ensure branch database exists (used by db:prepare enhancement)"
     task ensure_cloned: :environment do
+      next if BranchDb.skip_for_env?(Rails.env)
       next unless Rails.env.development?
 
       db_configs.each { BranchDb::Preparer.new(_1).prepare_if_needed }
