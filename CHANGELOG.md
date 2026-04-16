@@ -1,5 +1,14 @@
 ## [Unreleased]
 
+## [0.2.0] - 2026-04-16
+
+### Added
+
+- `BRANCH_DB_BRANCH` environment variable to override the detected git branch
+- `BRANCH_DB_DATABASE_DEVELOPMENT` and `BRANCH_DB_DATABASE_TEST` environment variables to override the computed database name per Rails environment
+- `BranchDb.overridden_for_env?`, `BranchDb.database_override_for_env`, and `BranchDb.skip_for_env?` public helpers
+- `db:branch:*` rake tasks now skip with a log message when the matching `BRANCH_DB_DATABASE_<ENV>` override is set for the current `Rails.env`
+
 ## [0.1.4] - 2026-03-11
 
 ### Added
