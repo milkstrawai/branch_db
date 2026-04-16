@@ -14,6 +14,35 @@ RSpec.describe BranchDb::GitUtils do
       allow(naming).to receive(:`).with("git symbolic-ref HEAD 2>/dev/null").and_return("")
       expect(naming.current_branch).to eq("")
     end
+
+    context "when BRANCH_DB_BRANCH env var is set" do
+      around do |example|
+        original = ENV.fetch("BRANCH_DB_BRANCH", nil)
+        ENV["BRANCH_DB_BRANCH"] = "override-branch"
+        example.run
+        ENV["BRANCH_DB_BRANCH"] = original
+      end
+
+      it "returns the env var value without shelling out to git" do # rubocop:disable RSpec/MultipleExpectations
+        expect(naming).not_to receive(:`) # rubocop:disable RSpec/MessageSpies
+        expect(naming.current_branch).to eq("override-branch")
+      end
+    end
+
+    context "when BRANCH_DB_BRANCH env var is empty" do
+      around do |example|
+        original = ENV.fetch("BRANCH_DB_BRANCH", nil)
+        ENV["BRANCH_DB_BRANCH"] = ""
+        example.run
+        ENV["BRANCH_DB_BRANCH"] = original
+      end
+
+      it "falls back to git symbolic-ref" do
+        allow(naming).to receive(:`).with("git symbolic-ref HEAD 2>/dev/null")
+                                    .and_return("refs/heads/real-branch\n")
+        expect(naming.current_branch).to eq("real-branch")
+      end
+    end
   end
 
   describe "#git_branches" do

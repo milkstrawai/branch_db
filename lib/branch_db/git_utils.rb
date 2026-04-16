@@ -1,6 +1,11 @@
 module BranchDb
   module GitUtils
-    def current_branch = `git symbolic-ref HEAD 2>/dev/null`.chomp.sub("refs/heads/", "")
+    def current_branch
+      override = ENV.fetch("BRANCH_DB_BRANCH", nil)
+      return override if override && !override.empty?
+
+      `git symbolic-ref HEAD 2>/dev/null`.chomp.sub("refs/heads/", "")
+    end
 
     def git_branches
       output = `git branch --format='%(refname:short)' 2>/dev/null`
