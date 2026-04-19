@@ -15,3 +15,11 @@ BranchDb.configure do |config|
   # config.development_suffix = '_development'
   # config.test_suffix = '_test'
 end
+
+# Optional environment variable overrides (no configuration needed — set when you need them):
+#
+#   BRANCH_DB_BRANCH                 Override the detected git branch name.
+#   BRANCH_DB_DATABASE_DEVELOPMENT   Override the development database name entirely.
+#   BRANCH_DB_DATABASE_TEST          Override the test database name entirely.
+#
+# See the README's "Overriding the Branch or Database" section for semantics and caveats.

@@ -85,7 +85,8 @@ module BranchDb
 
     def find_databases(prefix)
       check_pg_tools!(:psql, :dropdb)
-      stdout, = Open3.capture2(pg_env, "bash", "-c", "#{list_databases_cmd} | grep ^#{prefix.shellescape}")
+      cmd = "#{list_databases_cmd} | grep ^#{Regexp.escape(prefix).shellescape}"
+      stdout, = Open3.capture2(pg_env, "bash", "-c", cmd)
       stdout.split("\n").map(&:strip).reject(&:empty?)
     end
 

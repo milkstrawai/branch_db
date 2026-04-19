@@ -42,6 +42,71 @@ RSpec.describe BranchDb::Naming do
     it "appends branch suffix to base name" do
       expect(described_class.database_name("myapp_development")).to eq("myapp_development_feature_auth")
     end
+
+    context "when BRANCH_DB_DATABASE_DEVELOPMENT is set" do
+      around do |example|
+        original = ENV.fetch("BRANCH_DB_DATABASE_DEVELOPMENT", nil)
+        ENV["BRANCH_DB_DATABASE_DEVELOPMENT"] = "my_prod"
+        example.run
+        ENV["BRANCH_DB_DATABASE_DEVELOPMENT"] = original
+      end
+
+      it "returns the override for a development base name" do
+        expect(described_class.database_name("myapp_development")).to eq("my_prod")
+      end
+
+      it "does not apply to test base names" do
+        expect(described_class.database_name("myapp_test")).to eq("myapp_test_feature_auth")
+      end
+
+      it "does not apply to unrelated base names" do
+        expect(described_class.database_name("myapp")).to eq("myapp_feature_auth")
+      end
+    end
+
+    context "when BRANCH_DB_DATABASE_TEST is set" do
+      around do |example|
+        original = ENV.fetch("BRANCH_DB_DATABASE_TEST", nil)
+        ENV["BRANCH_DB_DATABASE_TEST"] = "shared_test_db"
+        example.run
+        ENV["BRANCH_DB_DATABASE_TEST"] = original
+      end
+
+      it "returns the override for a test base name" do
+        expect(described_class.database_name("myapp_test")).to eq("shared_test_db")
+      end
+
+      it "does not apply to development base names" do
+        expect(described_class.database_name("myapp_development")).to eq("myapp_development_feature_auth")
+      end
+    end
+
+    context "when override env var is an empty string" do
+      around do |example|
+        original = ENV.fetch("BRANCH_DB_DATABASE_DEVELOPMENT", nil)
+        ENV["BRANCH_DB_DATABASE_DEVELOPMENT"] = ""
+        example.run
+        ENV["BRANCH_DB_DATABASE_DEVELOPMENT"] = original
+      end
+
+      it "falls back to the branch-suffixed name" do
+        expect(described_class.database_name("myapp_development")).to eq("myapp_development_feature_auth")
+      end
+    end
+
+    context "with custom configured suffixes" do
+      around do |example|
+        original = ENV.fetch("BRANCH_DB_DATABASE_DEVELOPMENT", nil)
+        ENV["BRANCH_DB_DATABASE_DEVELOPMENT"] = "custom_override"
+        example.run
+        ENV["BRANCH_DB_DATABASE_DEVELOPMENT"] = original
+      end
+
+      it "honors non-default development_suffix" do
+        BranchDb.configure { |c| c.development_suffix = "_dev" }
+        expect(described_class.database_name("myapp_dev")).to eq("custom_override")
+      end
+    end
   end
 
   describe ".main_database_name" do
