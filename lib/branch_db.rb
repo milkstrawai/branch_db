@@ -6,6 +6,7 @@ require_relative "branch_db/pg_utils"
 require_relative "branch_db/logging"
 require_relative "branch_db/cloner"
 require_relative "branch_db/cleaner"
+require_relative "branch_db/inspector"
 require_relative "branch_db/preparer"
 require_relative "branch_db/railtie" if defined?(Rails::Railtie)
 
