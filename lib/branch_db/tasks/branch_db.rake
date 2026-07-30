@@ -2,6 +2,8 @@ def db_configs = ActiveRecord::Base.configurations.configs_for(env_name: Rails.e
 
 def cleaner_for(db_config) = BranchDb::Cleaner.new(db_config.configuration_hash, prefix: false, name: db_config.name)
 
+def inspector_for(config) = BranchDb::Inspector.new(config.configuration_hash, prefix: false, name: config.name)
+
 namespace :db do
   namespace :branch do
     desc "List all branch databases"
@@ -33,6 +35,13 @@ namespace :db do
       db_configs.each { BranchDb::Preparer.new(_1).prepare_if_needed }
     rescue ActiveRecord::ConnectionNotEstablished, PG::ConnectionBad => e
       abort "❌ Could not connect to Postgres: #{e.message}"
+    end
+
+    desc "Show current branch database info (branch, parent, database name, size)"
+    task info: :environment do
+      next if BranchDb.skip_for_env?(Rails.env)
+
+      db_configs.each { inspector_for(_1).report }
     end
   end
 end

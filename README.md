@@ -118,12 +118,12 @@ end
 
 ### Configuration Options
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `main_branch` | `'main'` | Your primary branch name (used as fallback clone source) |
-| `max_branch_length` | `33` | Max characters for branch suffix (prevents exceeding PostgreSQL's 63-char limit) |
-| `development_suffix` | `'_development'` | Suffix pattern for development databases |
-| `test_suffix` | `'_test'` | Suffix pattern for test databases |
+| Option               | Default          | Description                                                                      |
+| -------------------- | ---------------- | -------------------------------------------------------------------------------- |
+| `main_branch`        | `'main'`         | Your primary branch name (used as fallback clone source)                         |
+| `max_branch_length`  | `33`             | Max characters for branch suffix (prevents exceeding PostgreSQL's 63-char limit) |
+| `development_suffix` | `'_development'` | Suffix pattern for development databases                                         |
+| `test_suffix`        | `'_test'`        | Suffix pattern for test databases                                                |
 
 ## Usage
 
@@ -137,12 +137,14 @@ rails db:prepare
 ```
 
 **What happens (development only):**
+
 1. Checks if your branch's database exists and has schema
 2. If missing or empty and a parent/main DB exists, clones from the parent branch (or main as fallback)
 3. If on main branch or no source exists: defers to standard Rails behavior
 4. Rails then runs pending migrations and seeds as usual
 
 **Test databases** use standard Rails behavior (schema load, no cloning):
+
 ```bash
 RAILS_ENV=test rails db:prepare
 ```
@@ -151,11 +153,11 @@ RAILS_ENV=test rails db:prepare
 
 ### Available Commands
 
-| Command | Description |
-|---------|-------------|
-| `rails db:prepare` | Rails' standard command, enhanced with cloning from parent/main |
-| `rails db:branch:list` | List all branch databases |
-| `rails db:branch:purge` | Remove all branch databases except current and main. Use `FORCE=1` to skip confirmation. |
+| Command                 | Description                                                                                    |
+| ----------------------- | ---------------------------------------------------------------------------------------------- |
+| `rails db:prepare`      | Rails' standard command, enhanced with cloning from parent/main                                |
+| `rails db:branch:list`  | List all branch databases                                                                      |
+| `rails db:branch:purge` | Remove all branch databases except current and main. Use `FORCE=1` to skip confirmation.       |
 | `rails db:branch:prune` | Remove databases for branches that no longer exist in git. Use `FORCE=1` to skip confirmation. |
 
 ### Examples
@@ -280,6 +282,7 @@ When `BRANCH_DB_DATABASE_<ENV>` is set for the current `Rails.env`, the `db:bran
 ### Purge Safety
 
 The purge command protects important databases:
+
 - Current branch's development and test databases
 - Main branch's development and test databases
 - Databases with active connections (skipped with warning)
@@ -341,6 +344,7 @@ rails db:prepare
 ### Database Name Length
 
 PostgreSQL limits database names to 63 characters. With default settings:
+
 - Base name: up to 29 characters
 - Underscore: 1 character
 - Branch suffix: up to 33 characters
@@ -372,6 +376,7 @@ Remember to restart your Rails server after switching branches. The database nam
 ### Clone is slow for large databases
 
 `pg_dump | psql` is already efficient, but for very large databases consider:
+
 - Keeping your main branch database lean
 - Using database-level compression
 - Running cleanup regularly to remove old branch databases
@@ -416,6 +421,7 @@ bundle exec rake
 ### Test Coverage
 
 Coverage thresholds:
+
 - Line coverage: 100%
 - Branch coverage: 90%
 
@@ -452,6 +458,7 @@ Contributions are welcome. The usual drill:
 ### Reporting Issues
 
 Found a bug? Please open an issue with:
+
 - Ruby and Rails versions
 - PostgreSQL version
 - Steps to reproduce
